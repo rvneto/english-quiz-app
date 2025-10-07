@@ -20,9 +20,11 @@ services:
     container_name: english-quiz-backend
     ports:
       - "8080:8080" # Mapeia a porta do Spring Boot para sua máquina local
+      - "5005:5005" # Porta de Debug Remoto (local:container)
     environment:
       # Variável CRÍTICA: Conecta o Spring Boot ao container "mongo" pela rede interna
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/englishquizdb
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
     depends_on:
       - mongo # Garante que o MongoDB inicie antes do Backend
     networks:
