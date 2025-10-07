@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # 1. Serviço de Banco de Dados: MongoDB
+  mongo:
+    image: mongo:6.0 # Imagem oficial e estável
+    container_name: english-quiz-mongo
+    ports:
+      - "27017:27017" # Mapeia a porta do container para sua máquina local
+    volumes:
+      - mongo-data:/data/db # Referencia o volume persistente
+    networks:
+      - app-network # Conecta à rede interna
+
+  # 2. Serviço de Backend: Spring Boot
+  backend:
+    build:
+      context: . # Informa onde está o código-fonte
+      dockerfile: Dockerfile # Informa qual Dockerfile usar (criado no DEVOPS-2)
+    container_name: english-quiz-backend
+    ports:
+      - "8080:8080" # Mapeia a porta do Spring Boot para sua máquina local
+    environment:
+      # Variável CRÍTICA: Conecta o Spring Boot ao container "mongo" pela rede interna
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/englishquizdb
+    depends_on:
+      - mongo # Garante que o MongoDB inicie antes do Backend
+    networks:
+      - app-network # Conecta à rede interna
+
+# 3. Definições de Rede e Volumes
+networks:
+  app-network:
+    driver: bridge # Tipo de rede padrão para comunicação entre containers
+
+volumes:
+  mongo-data: # Volume referenciado no serviço 'mongo'
+    driver: local
