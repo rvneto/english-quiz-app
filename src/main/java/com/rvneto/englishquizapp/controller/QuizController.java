@@ -1,12 +1,12 @@
 package com.rvneto.englishquizapp.controller;
 
+import com.rvneto.englishquizapp.domain.dto.AnswerResultDTO;
 import com.rvneto.englishquizapp.domain.dto.QuestionDTO;
+import com.rvneto.englishquizapp.domain.dto.SubmittedAnswerDTO;
 import com.rvneto.englishquizapp.service.QuizService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,10 +20,6 @@ public class QuizController {
         this.quizService = quizService;
     }
     
-    /**
-     * Endpoint para buscar perguntas do quiz com filtros.
-     * Ex: GET /api/v1/quiz/questions?category=Grammar&level=BEGINNER&limit=10
-     */
     @GetMapping("/questions")
     public ResponseEntity<List<QuestionDTO>> getQuizQuestions(
             @RequestParam(required = true) String category,
@@ -37,6 +33,17 @@ public class QuizController {
         }
         
         return ResponseEntity.ok(questions);
+    }
+    
+    @PostMapping("/answer")
+    public ResponseEntity<AnswerResultDTO> submitAnswer(@RequestBody @Valid SubmittedAnswerDTO submission) {
+        
+        try {
+            AnswerResultDTO result = quizService.validateAnswer(submission);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
     
 }

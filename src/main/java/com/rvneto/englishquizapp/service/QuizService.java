@@ -1,7 +1,6 @@
 package com.rvneto.englishquizapp.service;
 
-import com.rvneto.englishquizapp.domain.dto.QuestionDTO;
-import com.rvneto.englishquizapp.domain.dto.QuizOptionDTO;
+import com.rvneto.englishquizapp.domain.dto.*;
 import com.rvneto.englishquizapp.domain.enums.DifficultyLevel;
 import com.rvneto.englishquizapp.domain.enums.QuestionStatus;
 import com.rvneto.englishquizapp.domain.model.Category;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,4 +89,41 @@ public class QuizService {
         dto.setOptions(options);
         return dto;
     }
+    
+    /**
+     * Recebe a resposta de UMA pergunta do usuário, valida contra o DB e retorna o feedback.
+     */
+    public AnswerResultDTO validateAnswer(SubmittedAnswerDTO submittedAnswer) {
+        
+        Optional<Question> optionalQuestion = questionRepository.findById(submittedAnswer.getQuestionId());
+        
+        if (optionalQuestion.isEmpty()) {
+            throw new IllegalArgumentException("Pergunta não encontrada com o ID: " + submittedAnswer.getQuestionId());
+        }
+        
+        Question question = optionalQuestion.get();
+        AnswerResultDTO resultDetail = new AnswerResultDTO();
+        
+        resultDetail.setQuestionId(submittedAnswer.getQuestionId());
+        resultDetail.setSelectedOptionIndex(submittedAnswer.getSelectedOptionIndex());
+        
+        resultDetail.setExplanation(question.getExplanation());
+        resultDetail.setExplanationTranslation(question.getExplanationTranslation());
+        
+        int correctIndex = -1;
+        for (int i = 0; i < question.getOptions().size(); i++) {
+            if (question.getOptions().get(i).isCorrect()) {
+                correctIndex = i;
+                break;
+            }
+        }
+        
+        resultDetail.setCorrectOptionIndex(correctIndex);
+        
+        boolean isCorrect = submittedAnswer.getSelectedOptionIndex().equals(correctIndex);
+        resultDetail.setCorrect(isCorrect);
+        
+        return resultDetail;
+    }
+    
 }
