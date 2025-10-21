@@ -30,6 +30,26 @@ services:
     networks:
       - app-network # Conecta à rede interna
 
+  # 3. Serviço de Frontend: React com Nginx
+  frontend:
+      build:
+        context: ./frontend  # Aponta para a pasta do frontend
+        dockerfile: Dockerfile
+        # Variável de ambiente para a fase de build
+        args:
+          VITE_REACT_APP_API_URL: http://backend:8080/api/v1
+      container_name: english-quiz-frontend
+      ports:
+        # Expor a porta 80 do container para a porta 3000 local
+        - "3000:80" 
+      environment:
+        # Variável de ambiente para o React - usada pelo Nginx Proxy
+        VITE_REACT_APP_API_URL: http://backend:8080/api/v1
+      networks:
+        - app-network
+      depends_on:
+        - backend
+
 # 3. Definições de Rede e Volumes
 networks:
   app-network:
