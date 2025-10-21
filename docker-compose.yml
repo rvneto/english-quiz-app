@@ -15,7 +15,7 @@ services:
   # 2. Serviço de Backend: Spring Boot
   backend:
     build:
-      context: . # Informa onde está o código-fonte
+      context: ./backend # Informa onde está o código-fonte
       dockerfile: Dockerfile # Informa qual Dockerfile usar (criado no DEVOPS-2)
     container_name: english-quiz-backend
     ports:
