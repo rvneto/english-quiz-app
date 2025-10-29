@@ -1,0 +1,388 @@
+<!-- frontend/quiz.html (NOVO FICHEIRO) -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>English Quiz - Em Progresso</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Axios CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .option-button {
+        transition: all 0.2s ease-in-out;
+        border: 2px solid #e5e7eb; /* gray-200 */
+      }
+      .option-button:hover:not(.disabled) {
+        border-color: #6366f1; /* indigo-500 */
+        background-color: #fafaff;
+      }
+      .option-button.selected {
+        border-color: #4338ca; /* indigo-800 */
+        background-color: #eef2ff; /* indigo-100 */
+        font-weight: 600;
+      }
+      .option-button.correct {
+        background-color: #dcfce7; /* green-100 */
+        border-color: #22c55e; /* green-500 */
+      }
+      .option-button.incorrect {
+        background-color: #fee2e2; /* red-100 */
+        border-color: #ef4444; /* red-500 */
+      }
+      .disabled {
+        pointer-events: none;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
+    <div
+      id="quiz-container"
+      class="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-6 md:p-10 hidden"
+    >
+      <!-- Cabeçalho do Quiz (Progresso) -->
+      <header class="mb-6">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-sm font-semibold text-indigo-600"
+            >Questão <span id="current-q-number">1</span> de
+            <span id="total-q-number">10</span></span
+          >
+          <a href="/index.html" class="text-sm text-gray-500 hover:text-red-500"
+            >&times; Sair</a
+          >
+        </div>
+        <!-- Barra de Progresso (simples) -->
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div
+            id="progress-bar"
+            class="bg-indigo-600 h-2.5 rounded-full"
+            style="width: 10%"
+          ></div>
+        </div>
+      </header>
+
+      <!-- Pergunta -->
+      <section id="question-section" class="mb-6">
+        <h2
+          id="question-content"
+          class="text-2xl font-semibold text-gray-900 mb-4"
+        >
+          Carregando pergunta...
+        </h2>
+        <div id="options-container" class="flex flex-col gap-4">
+          <!-- Opções serão injetadas pelo JS -->
+        </div>
+      </section>
+
+      <!-- Feedback (Certo/Errado) -->
+      <section
+        id="feedback-section"
+        class="hidden p-4 rounded-lg bg-gray-50 border border-gray-200"
+      >
+        <h3 id="feedback-title" class="text-xl font-bold"></h3>
+        <p id="feedback-explanation" class="text-gray-700 mt-2"></p>
+        <p
+          id="feedback-translation"
+          class="text-sm text-gray-500 italic mt-1"
+        ></p>
+      </section>
+
+      <!-- Ações (Botões) -->
+      <footer class="mt-8 pt-6 border-t text-center">
+        <button
+          id="check-answer-btn"
+          class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 disabled:opacity-50"
+          disabled
+        >
+          Verificar Resposta
+        </button>
+        <button
+          id="next-question-btn"
+          class="bg-gray-800 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-900 transition duration-300 hidden"
+        >
+          Próxima Pergunta
+        </button>
+        <button
+          id="view-results-btn"
+          class="bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-700 transition duration-300 hidden"
+        >
+          Ver Resultados
+        </button>
+      </footer>
+    </div>
+
+    <!-- Mensagem de Erro/Loading Global -->
+    <div id="global-message-container" class="text-center">
+      <p id="global-loading" class="text-xl text-gray-600">
+        Carregando Quiz...
+      </p>
+      <p id="global-error" class="text-xl text-red-600 hidden"></p>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Estado Global do Quiz
+        let quizQuestions = []; // Array de perguntas
+        let currentQuestionIndex = 0;
+        let selectedOptionIndex = null;
+        let score = 0;
+        let quizFilters = {};
+
+        // Elementos DOM
+        const quizContainer = document.getElementById('quiz-container');
+        const globalLoading = document.getElementById('global-loading');
+        const globalError = document.getElementById('global-error');
+
+        const currentQNumberEl = document.getElementById('current-q-number');
+        const totalQNumberEl = document.getElementById('total-q-number');
+        const progressBar = document.getElementById('progress-bar');
+
+        const questionContentEl = document.getElementById('question-content');
+        const optionsContainerEl = document.getElementById('options-container');
+
+        const feedbackSection = document.getElementById('feedback-section');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackExplanation = document.getElementById(
+          'feedback-explanation',
+        );
+        const feedbackTranslation = document.getElementById(
+          'feedback-translation',
+        );
+
+        const checkAnswerBtn = document.getElementById('check-answer-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const viewResultsBtn = document.getElementById('view-results-btn');
+
+        // 1. Iniciar o Quiz
+        async function initializeQuiz() {
+          try {
+            quizFilters = parseQueryParams();
+            quizQuestions = await fetchQuestions(quizFilters);
+
+            totalQNumberEl.textContent = quizQuestions.length;
+
+            globalLoading.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+
+            renderQuestion(currentQuestionIndex);
+          } catch (error) {
+            console.error('Falha ao inicializar o quiz:', error);
+            globalLoading.classList.add('hidden');
+            globalError.textContent =
+              'Erro ao carregar o quiz. Tente voltar e selecionar novamente.';
+            globalError.classList.remove('hidden');
+          }
+        }
+
+        // 2. Ler os filtros da URL
+        function parseQueryParams() {
+          const params = new URLSearchParams(window.location.search);
+          const category = params.get('category');
+          const level = params.get('level');
+          const limit = parseInt(params.get('limit')) || 10;
+
+          if (!category || !level) {
+            throw new Error('Filtros de categoria ou nível em falta.');
+          }
+          return { category, level, limit };
+        }
+
+        // 3. Buscar as perguntas no Backend (GET)
+        async function fetchQuestions(filters) {
+          console.log('Buscando perguntas com filtros:', filters);
+          // O Nginx faz o proxy da URL relativa
+          const response = await axios.get('/api/v1/quiz/questions', {
+            params: filters,
+          });
+
+          if (response.data && response.data.length > 0) {
+            return response.data;
+          } else {
+            throw new Error('Nenhuma pergunta encontrada para estes filtros.');
+          }
+        }
+
+        // 4. Renderizar a pergunta atual (COM A CORREÇÃO DE ÍNDICE)
+        function renderQuestion(index) {
+          const question = quizQuestions[index];
+
+          // Resetar o estado da interface
+          selectedOptionIndex = null;
+          feedbackSection.classList.add('hidden');
+          checkAnswerBtn.classList.remove('hidden');
+          nextQuestionBtn.classList.add('hidden');
+          checkAnswerBtn.disabled = true;
+
+          // Atualizar progresso
+          currentQNumberEl.textContent = index + 1;
+          progressBar.style.width = `${
+            ((index + 1) / quizQuestions.length) * 100
+          }%`;
+
+          // Renderizar conteúdo
+          questionContentEl.textContent = question.content;
+          optionsContainerEl.innerHTML = ''; // Limpar opções anteriores
+
+          // ##################################################
+          // ##           INÍCIO DA CORREÇÃO               ##
+          // ##################################################
+
+          // Usamos .forEach com o índice (i)
+          question.options.forEach((option, i) => {
+            // 'i' será 0, 1, 2, 3
+            const button = document.createElement('button');
+            button.classList.add(
+              'option-button',
+              'p-4',
+              'rounded-lg',
+              'text-left',
+              'w-full',
+            );
+            button.textContent = option.text;
+
+            // Definimos o data-index usando 'i'
+            button.setAttribute('data-index', i);
+
+            button.addEventListener('click', () => {
+              // Lógica de seleção de opção
+              optionsContainerEl
+                .querySelectorAll('.option-button')
+                .forEach((btn) => btn.classList.remove('selected'));
+              button.classList.add('selected');
+
+              // Definimos o selectedOptionIndex usando 'i'
+              selectedOptionIndex = i;
+
+              checkAnswerBtn.disabled = false;
+            });
+            optionsContainerEl.appendChild(button);
+          });
+
+          // ##################################################
+          // ##            FIM DA CORREÇÃO                 ##
+          // ##################################################
+        }
+
+        // 5. Ação: Verificar Resposta (POST)
+        checkAnswerBtn.addEventListener('click', async () => {
+          checkAnswerBtn.disabled = true; // Desabilita para evitar cliques duplos
+
+          const questionId = quizQuestions[currentQuestionIndex].id;
+          const payload = {
+            questionId: questionId,
+            selectedOptionIndex: selectedOptionIndex,
+          };
+
+          try {
+            // O Nginx faz o proxy da URL relativa
+            const response = await axios.post('/api/v1/quiz/answer', payload);
+            const result = response.data;
+
+            showFeedback(result);
+          } catch (error) {
+            console.error('Erro ao verificar resposta:', error);
+            alert('Erro ao conectar com o servidor. Tente novamente.');
+            checkAnswerBtn.disabled = false;
+          }
+        });
+
+        // 6. Mostrar Feedback (Certo/Errado) - LÓGICA CORRIGIDA + LOGS
+        function showFeedback(result) {
+          // ##################################################
+          // ##           LOG DE DEBUG DO FRONTEND           ##
+          // ##################################################
+          console.log('Recebida resposta do Backend:', result);
+          console.log("Verificando 'result.isCorrect':", result.isCorrect); // <-- O PROBLEMA ESTÁ AQUI
+          console.log(
+            'Índice correto (do Backend):',
+            result.correctOptionIndex,
+          );
+          console.log(
+            'Índice selecionado (pelo User):',
+            result.selectedOptionIndex,
+          );
+          // ##################################################
+
+          // Desabilitar todos os botões de opção
+          optionsContainerEl
+            .querySelectorAll('.option-button')
+            .forEach((btn) => {
+              btn.classList.add('disabled');
+              const btnIndex = parseInt(btn.getAttribute('data-index'));
+
+              // Lógica de pintura:
+
+              // 1. Pinta a resposta CORRETA de verde, se o utilizador errou
+              // (Aqui: !result.correct)
+              if (!result.isCorrect && btnIndex === result.correctOptionIndex) {
+                btn.classList.add('correct');
+              }
+
+              // 2. Pinta a resposta SELECIONADA (que pode ser a certa ou a errada)
+              // (Aqui: result.correct)
+              if (btnIndex === result.selectedOptionIndex) {
+                if (result.isCorrect) {
+                  btn.classList.add('correct');
+                } else {
+                  btn.classList.add('incorrect');
+                }
+              }
+            });
+
+          // Contar o score
+          // (Aqui: result.correct)
+          if (result.isCorrect) {
+            score++;
+            feedbackTitle.textContent = 'Correto! 🎉';
+            feedbackTitle.classList.remove('text-red-600');
+            feedbackTitle.classList.add('text-green-600');
+          } else {
+            feedbackTitle.textContent = 'Incorreto 😕';
+            feedbackTitle.classList.remove('text-green-600');
+            feedbackTitle.classList.add('text-red-600');
+          }
+
+          feedbackExplanation.textContent = result.explanation;
+          feedbackTranslation.textContent = result.explanationTranslation;
+          feedbackSection.classList.remove('hidden');
+
+          // Esconder botão de verificar e mostrar o de avançar
+          checkAnswerBtn.classList.add('hidden');
+
+          if (currentQuestionIndex < quizQuestions.length - 1) {
+            nextQuestionBtn.classList.remove('hidden');
+          } else {
+            // Última pergunta
+            viewResultsBtn.classList.remove('hidden');
+          }
+        }
+
+        // 7. Ação: Próxima Pergunta
+        nextQuestionBtn.addEventListener('click', () => {
+          currentQuestionIndex++;
+          renderQuestion(currentQuestionIndex);
+        });
+
+        // 8. Ação: Ver Resultados (Fim do Quiz)
+        viewResultsBtn.addEventListener('click', () => {
+          // Navega para uma página de resultados (ainda por criar)
+          alert(
+            `Quiz terminado! Você acertou ${score} de ${quizQuestions.length}.`,
+          );
+          window.location.href = '/index.html'; // Volta para o início
+        });
+
+        // Inicia o Quiz
+        initializeQuiz();
+      });
+    </script>
+  </body>
+</html>

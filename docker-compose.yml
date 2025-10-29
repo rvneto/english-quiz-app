@@ -6,7 +6,7 @@ services:
     image: mongo:6.0 # Imagem oficial e estável
     container_name: english-quiz-mongo
     ports:
-      - "27017:27017" # Mapeia a porta do container para sua máquina local
+      - '27017:27017' # Mapeia a porta do container para sua máquina local
     volumes:
       - mongo-data:/data/db # Referencia o volume persistente
     networks:
@@ -19,8 +19,8 @@ services:
       dockerfile: Dockerfile # Informa qual Dockerfile usar (criado no DEVOPS-2)
     container_name: english-quiz-backend
     ports:
-      - "8080:8080" # Mapeia a porta do Spring Boot para sua máquina local
-      - "5005:5005" # Porta de Debug Remoto (local:container)
+      - '8080:8080' # Mapeia a porta do Spring Boot para sua máquina local
+      - '5005:5005' # Porta de Debug Remoto (local:container)
     environment:
       # Variável CRÍTICA: Conecta o Spring Boot ao container "mongo" pela rede interna
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/englishquizdb
@@ -30,25 +30,34 @@ services:
     networks:
       - app-network # Conecta à rede interna
 
-  # 3. Serviço de Frontend: React com Nginx
+  # 3. Serviço Frontend (Simplificado)
   frontend:
-      build:
-        context: ./frontend  # Aponta para a pasta do frontend
-        dockerfile: Dockerfile
-        # Variável de ambiente para a fase de build
-        args:
-          VITE_REACT_APP_API_URL: http://backend:8080/api/v1
-      container_name: english-quiz-frontend
-      ports:
-        # Expor a porta 80 do container para a porta 3000 local
-        - "3000:80" 
-      environment:
-        # Variável de ambiente para o React - usada pelo Nginx Proxy
-        VITE_REACT_APP_API_URL: http://backend:8080/api/v1
-      networks:
-        - app-network
-      depends_on:
-        - backend
+    build:
+      context: ./frontend # Aponta para a pasta do frontend
+      dockerfile: Dockerfile
+    container_name: english-quiz-frontend
+    ports:
+      # Mapeia a porta 3000 do seu PC para a porta 80 do container Nginx
+      - '3000:80'
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+    # ##################################################
+    # ##           INÍCIO DA MODIFICAÇÃO              ##
+    # ##################################################
+    volumes:
+      # Mapeia a pasta local 'frontend' para a pasta 'html' do Nginx
+      # O que estiver no seu PC aparece instantaneamente no container
+      - ./frontend:/usr/share/nginx/html
+
+      # Mapeia a configuração do Nginx (necessário porque a linha acima
+      # esconde o Dockerfile COPY da config)
+      - ./frontend/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    # ##################################################
+    # ##            FIM DA MODIFICAÇÃO                ##
+    # ##################################################
 
 # 3. Definições de Rede e Volumes
 networks:

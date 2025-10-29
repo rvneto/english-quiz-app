@@ -3,11 +3,17 @@
 FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y dos2unix
+
 # Copia os arquivos de configuração essenciais
 COPY pom.xml .
 COPY mvnw .
 COPY .mvn .mvn
 COPY src src
+
+RUN dos2unix ./mvnw
+
+RUN chmod +x ./mvnw
 
 # Compila e empacota o JAR do Spring Boot
 RUN ./mvnw package -DskipTests
