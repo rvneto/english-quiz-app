@@ -61,9 +61,10 @@
           <span id="score-percent">0</span>%
         </div>
         <div
+          id="score-feedback-label"
           class="inline-block bg-indigo-100 text-indigo-800 text-sm font-semibold px-4 py-1 rounded-full mb-8"
         >
-          Muito Bom
+          <!-- O texto será inserido via JS -->
         </div>
 
         <!-- Stats (Contagem) -->
@@ -150,6 +151,31 @@
 
         // Calcula o score percentual
         const score = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+        // ##################################################
+        // ##           INÍCIO DA MODIFICAÇÃO              ##
+        // ##################################################
+
+        // 3. Definir o texto de feedback dinâmico
+        const feedbackLabel = document.getElementById('score-feedback-label');
+        let feedbackMessage = '';
+
+        if (score === 100) {
+          feedbackMessage = 'Excelente! 🏆';
+        } else if (score > 90) {
+          feedbackMessage = 'Ótimo!';
+        } else if (score > 70) {
+          feedbackMessage = 'Muito bom';
+        } else if (score > 50) {
+          feedbackMessage = 'Continue praticando';
+        } else if (score > 30) {
+          feedbackMessage = 'Estamos melhorando';
+        } else {
+          feedbackMessage = 'Vamos estudar mais';
+        }
+        feedbackLabel.textContent = feedbackMessage;
+
+        // ##################################################
 
         // 2. Preencher os elementos do DOM
         document.getElementById('score-percent').textContent = score;
