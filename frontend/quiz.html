@@ -77,6 +77,18 @@
         >
           Carregando pergunta...
         </h2>
+
+        <!-- ################################################## -->
+        <!-- ##           NOVO ELEMENTO ADICIONADO           ## -->
+        <!-- ################################################## -->
+        <p id="question-translation" class="text-md text-gray-500 italic mb-6"></p>
+        
+        
+        <div id="options-container" class="flex flex-col gap-4">
+          <!-- Opções serão injetadas pelo JS -->
+        </div>
+      </section>
+
         <div id="options-container" class="flex flex-col gap-4">
           <!-- Opções serão injetadas pelo JS -->
         </div>
@@ -146,6 +158,7 @@
         const progressBar = document.getElementById('progress-bar');
 
         const questionContentEl = document.getElementById('question-content');
+        const questionTranslationEl = document.getElementById('question-translation');
         const optionsContainerEl = document.getElementById('options-container');
 
         const feedbackSection = document.getElementById('feedback-section');
@@ -229,6 +242,7 @@
 
           // Renderizar conteúdo
           questionContentEl.textContent = question.content;
+          questionTranslationEl.textContent = question.contentTranslation;
           optionsContainerEl.innerHTML = ''; // Limpar opções anteriores
 
           // ##################################################
