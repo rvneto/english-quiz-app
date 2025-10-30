@@ -371,14 +371,34 @@
           renderQuestion(currentQuestionIndex);
         });
 
+        // ##################################################
+        // ##           INÍCIO DA MODIFICAÇÃO              ##
+        // ##################################################
+
         // 8. Ação: Ver Resultados (Fim do Quiz)
         viewResultsBtn.addEventListener('click', () => {
-          // Navega para uma página de resultados (ainda por criar)
-          alert(
-            `Quiz terminado! Você acertou ${score} de ${quizQuestions.length}.`,
+          // Calcular o resultado final
+          const total = quizQuestions.length;
+          const correct = score;
+          const incorrect = total - correct;
+          const percentage = Math.round((correct / total) * 100);
+
+          // Obter os filtros originais para passar para a próxima página
+          const category = quizFilters.category;
+          const level = quizFilters.level;
+          const limit = quizFilters.limit;
+
+          console.log(
+            `Fim do Quiz. Score: ${correct}/${total} (${percentage}%)`,
           );
-          window.location.href = '/index.html'; // Volta para o início
+
+          // Navega para a página de resultados, passando os dados via parâmetros de URL
+          window.location.href = `/results.html?score-percent=${percentage}&correct=${correct}&incorrect=${incorrect}&total=${total}&category=${category}&level=${level}&limit=${limit}`;
         });
+
+        // ##################################################
+        // ##            FIM DA MODIFICAÇÃO                ##
+        // ##################################################
 
         // Inicia o Quiz
         initializeQuiz();

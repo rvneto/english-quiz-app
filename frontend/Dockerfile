@@ -6,9 +6,10 @@ WORKDIR /usr/share/nginx/html
 
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Copia os dois ficheiros HTML
+# Copia os três ficheiros HTML
 COPY index.html .
-COPY quiz.html .  
+COPY quiz.html .
+COPY results.html .  
 
 # Copia a configuração do Nginx
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
