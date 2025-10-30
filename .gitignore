@@ -1,29 +1,40 @@
-# Arquivos de Log
+# Logs, temp
 *.log
+*.tmp
+/tmp/
+*.swp
 
 # Arquivos de Build e Dependências (Maven/Gradle)
 target/
 .mvn/
 build/
 
-# Arquivos de IDE
-
-## IntelliJ
-.idea/
+# Java
+backend/target/
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/.idea/
 *.iml
+
+# Node/Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env.local
+/environment/
+
+# Docker
+docker-compose.override.yml
+*.env
+
+# IDEs
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.user
 *.iws
-
-## Eclipse
-.classpath
-.project
-.settings/
-
-## NetBeans
-/nbproject/private/
-/build/
-/nbbuild/
-/dist/
-/nbdist/
 
 ## VS Code
 .vscode/
