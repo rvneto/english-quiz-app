@@ -24,6 +24,20 @@ jobs:
     # A máquina virtual que o GitHub irá usar (Ubuntu é o padrão)
     runs-on: ubuntu-latest
 
+    services:
+      # O nome "mongo" é CRUCIAL.
+      # O GHA fará o hostname "mongo" apontar para este container.
+      mongo:
+        image: mongo:6.0 # Use a mesma imagem do seu docker-compose
+        ports:
+          - 27017:27017 # Mapeia a porta (boa prática)
+        # OBRIGATÓRIO: Espera o Mongo estar pronto antes de rodar os steps
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Test DNS resolution
         run: |
