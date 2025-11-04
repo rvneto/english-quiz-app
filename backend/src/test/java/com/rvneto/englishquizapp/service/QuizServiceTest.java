@@ -105,7 +105,7 @@ class QuizServiceTest {
         category.setName("Grammar");
 
         when(categoryRepository.findByName("Grammar")).thenReturn(category);
-        when(questionRepository.findByDifficultyLevelAndStatus(any(DifficultyLevel.class), any(QuestionStatus.class), any(Pageable.class)))
+        when(questionRepository.findByCategoryAndDifficultyLevelAndStatus(any(Category.class), any(DifficultyLevel.class), any(QuestionStatus.class), any(Pageable.class)))
                 .thenReturn(List.of(sampleQuestion));
 
         List<QuestionDTO> questions = quizService.findQuestionsForQuiz("Grammar", "BEGINNER", 1);
@@ -131,7 +131,7 @@ class QuizServiceTest {
         category.setName("Vocabulary");
 
         when(categoryRepository.findByName("Vocabulary")).thenReturn(category);
-        when(questionRepository.findByDifficultyLevelAndStatus(any(DifficultyLevel.class), any(QuestionStatus.class), any(Pageable.class)))
+        when(questionRepository.findByCategoryAndDifficultyLevelAndStatus(any(Category.class), any(DifficultyLevel.class), any(QuestionStatus.class), any(Pageable.class)))
                 .thenReturn(Collections.emptyList());
 
         List<QuestionDTO> questions = quizService.findQuestionsForQuiz("Vocabulary", "INTERMEDIATE", 5);

@@ -52,7 +52,8 @@ public class QuizService {
         }
 
         Pageable pageable = PageRequest.of(0, limit);
-        List<Question> limitedQuestions = questionRepository.findByDifficultyLevelAndStatus(
+        List<Question> limitedQuestions = questionRepository.findByCategoryAndDifficultyLevelAndStatus(
+                category,
                 difficultyLevel,
                 QuestionStatus.ACTIVE,
                 pageable);
