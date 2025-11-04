@@ -9,6 +9,11 @@ services:
       - '27017:27017' # Mapeia a porta do container para sua máquina local
     volumes:
       - mongo-data:/data/db # Referencia o volume persistente
+    healthcheck: # Definição do healthcheck para o MongoDB
+      test: ['CMD', 'mongosh', '--eval', "db.runCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - app-network # Conecta à rede interna
 
@@ -26,7 +31,8 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/englishquizdb
       JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
     depends_on:
-      - mongo # Garante que o MongoDB inicie antes do Backend
+      mongo: # Garante que o MongoDB inicie antes do Backend
+        condition: service_healthy # Adiciona um healthcheck
     networks:
       - app-network # Conecta à rede interna
 

@@ -25,6 +25,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Test DNS resolution
+        run: |
+          ping mongo
+          nslookup mongo
+
       # 1. Checkout do Código
       # Baixa o seu código (o repositório completo) para a máquina virtual
       - name: Checkout repository
