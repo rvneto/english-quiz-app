@@ -25,18 +25,11 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      # O nome "mongo" é CRUCIAL.
-      # O GHA fará o hostname "mongo" apontar para este container.
       mongo:
-        image: mongo:6.0 # Use a mesma imagem do seu docker-compose
+        image: mongo:6.0
         ports:
-          - 27017:27017 # Mapeia a porta (boa prática)
-        # OBRIGATÓRIO: Espera o Mongo estar pronto antes de rodar os steps
-        options: >-
-          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          - 27017:27017
+        # GHA vai usar o HEALTHCHECK da própria imagem 'mongo:6.0'
 
     steps:
       - name: Test DNS resolution
@@ -57,6 +50,11 @@ jobs:
           java-version: '21'
           distribution: 'temurin' # (Eclipse Temurin, o mesmo que usámos)
           cache: 'maven' # Ativa o cache das dependências do Maven
+
+      - name: Wait for MongoDB to be fully ready
+        run: |
+          echo "Waiting for Mongo to initialize..."
+          sleep 10 # Dá 10s para o Mongo se estabilizar
 
       # 3. Executar os Testes Unitários
       # Corre o comando 'mvn test' apontando para o pom.xml correto
