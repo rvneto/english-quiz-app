@@ -32,11 +32,6 @@ jobs:
         # GHA vai usar o HEALTHCHECK da própria imagem 'mongo:6.0'
 
     steps:
-      - name: Test DNS resolution
-        run: |
-          ping mongo
-          nslookup mongo
-
       # 1. Checkout do Código
       # Baixa o seu código (o repositório completo) para a máquina virtual
       - name: Checkout repository
@@ -57,11 +52,12 @@ jobs:
           sleep 10 # Dá 10s para o Mongo se estabilizar
 
       # 3. Executar os Testes Unitários
-      # Corre o comando 'mvn test' apontando para o pom.xml correto
       - name: Run Unit Tests (Maven)
-        # O '-B' é "batch mode" (para logs limpos)
-        # O '--file' aponta para o pom.xml dentro da pasta 'backend'
         run: mvn -B test --file backend/pom.xml
+        # Define a URI para apontar para 'localhost'
+        # já que a porta 27017 está mapeada para o host
+        env:
+          SPRING_DATA_MONGODB_URI: mongodb://localhost:27017/englishquizdb
 
       # 4. (Opcional, mas recomendado) Construir o Pacote (JAR)
       # Se os testes passarem, ele constrói o .jar final
