@@ -393,6 +393,136 @@ public class QuestionSeeder implements CommandLineRunner {
                             new AnswerOption("bring up", true),
                             new AnswerOption("bring off", false)
                     )
+            ),
+            new QuestionData(
+                    "I always ___ at 7:00 AM, even on weekends.",
+                    "Eu sempre ___ às 7:00 da manhã, mesmo nos fins de semana.",
+                    "The phrasal verb 'wake up' means to stop sleeping, which fits the context of a morning routine.",
+                    "O phrasal verb 'wake up' significa parar de dormir, o que se encaixa no contexto de uma rotina matinal.",
+                    DifficultyLevel.BEGINNER, "Phrasal Verbs",
+                    Arrays.asList(
+                            new AnswerOption("look for", false),
+                            new AnswerOption("wake up", true),
+                            new AnswerOption("go back", false),
+                            new AnswerOption("turn down", false)
+                    )
+            ),
+            new QuestionData(
+                    "It is cold outside, so you should ___ your coat.",
+                    "Está frio lá fora, então você deve ___ seu casaco.",
+                    "To 'put on' means to place an item of clothing on your body.",
+                    "O phrasal verb 'put on' significa vestir uma peça de roupa.",
+                    DifficultyLevel.BEGINNER, "Phrasal Verbs",
+                    Arrays.asList(
+                            new AnswerOption("get off", false),
+                            new AnswerOption("take over", false),
+                            new AnswerOption("put on", true),
+                            new AnswerOption("give in", false)
+                    )
+            ),
+            new QuestionData(
+                    "Please ___ the light before you leave the room.",
+                    "Por favor, ___ a luz antes de sair da sala.",
+                    "To 'turn off' means to stop the flow of electricity to a device, like a light.",
+                    "O phrasal verb 'turn off' significa desligar o fluxo de eletricidade para um aparelho, como uma luz.",
+                    DifficultyLevel.BEGINNER, "Phrasal Verbs",
+                    Arrays.asList(
+                            new AnswerOption("call back", false),
+                            new AnswerOption("get up", false),
+                            new AnswerOption("turn off", true),
+                            new AnswerOption("pass out", false)
+                    )
+            ),
+            new QuestionData(
+                    "She is ___ her keys; she cannot find them anywhere.",
+                    "Ela está ___ as chaves dela; ela não as consegue encontrar em lugar nenhum.",
+                    "The phrasal verb 'look for' means to search for something you have lost.",
+                    "O phrasal verb 'look for' significa procurar por algo que você perdeu.",
+                    DifficultyLevel.BEGINNER, "Phrasal Verbs",
+                    Arrays.asList(
+                            new AnswerOption("looking for", true),
+                            new AnswerOption("looking up", false),
+                            new AnswerOption("looking out", false),
+                            new AnswerOption("looking at", false)
+                    )
+            ),
+            new QuestionData(
+                    "Let's ___ to the park this afternoon.",
+                    "Vamos ___ ao parque esta tarde.",
+                    "To 'go out' means to leave your home to go to a public place, like a park.",
+                    "O phrasal verb 'go out' significa sair de casa para ir a um lugar público, como um parque.",
+                    DifficultyLevel.BEGINNER, "Phrasal Verbs",
+                    Arrays.asList(
+                            new AnswerOption("hold on", false),
+                            new AnswerOption("run into", false),
+                            new AnswerOption("go out", true),
+                            new AnswerOption("break down", false)
+                    )
+            ),
+            new QuestionData(
+                    "He said he would ___ home after finishing his errands.",
+                    "Ele disse que iria ___ para casa depois de terminar seus recados.",
+                    "To 'come back' means to return to a place, such as home.",
+                    "O phrasal verb 'come back' significa retornar a um lugar, como para casa.",
+                    DifficultyLevel.BEGINNER, "Phrasal Verbs",
+                    Arrays.asList(
+                            new AnswerOption("take off", false),
+                            new AnswerOption("come back", true),
+                            new AnswerOption("set up", false),
+                            new AnswerOption("show up", false)
+                    )
+            ),
+            new QuestionData(
+                    "It's a difficult puzzle, but don't ___! Keep trying.",
+                    "É um quebra-cabeça difícil, mas não ___! Continue tentando.",
+                    "To 'give up' means to stop trying to do something.",
+                    "O phrasal verb 'give up' significa parar de tentar fazer algo.",
+                    DifficultyLevel.BEGINNER, "Phrasal Verbs",
+                    Arrays.asList(
+                            new AnswerOption("give off", false),
+                            new AnswerOption("give in", false),
+                            new AnswerOption("give up", true),
+                            new AnswerOption("give away", false)
+                    )
+            ),
+            new QuestionData(
+                    "Every morning, I ___ at 7:00 and start my day.",
+                    "Todas as manhãs, eu ___ às 7:00 e começo o meu dia.",
+                    "The phrasal verb 'get up' means to rise from bed after waking up.",
+                    "O phrasal verb 'get up' significa levantar-se da cama depois de acordar.",
+                    DifficultyLevel.BEGINNER, "Phrasal Verbs",
+                    Arrays.asList(
+                            new AnswerOption("try on", false),
+                            new AnswerOption("get up", true),
+                            new AnswerOption("find out", false),
+                            new AnswerOption("put away", false)
+                    )
+            ),
+            new QuestionData(
+                    "When you come inside, please ___ your hat.",
+                    "Quando você entrar, por favor, ___ seu chapéu.",
+                    "To 'take off' means to remove clothing or accessories from your body.",
+                    "O phrasal verb 'take off' significa remover roupas ou acessórios do seu corpo.",
+                    DifficultyLevel.BEGINNER, "Phrasal Verbs",
+                    Arrays.asList(
+                            new AnswerOption("go on", false),
+                            new AnswerOption("take off", true),
+                            new AnswerOption("run out", false),
+                            new AnswerOption("hang up", false)
+                    )
+            ),
+            new QuestionData(
+                    "I can't talk right now, but I will ___ you ___ later this afternoon.",
+                    "Não posso falar agora, mas eu vou ___ para você ___ mais tarde esta tarde.",
+                    "The separable phrasal verb 'call back' means to return a phone call to someone.",
+                    "O phrasal verb separável 'call back' significa retornar uma ligação telefônica para alguém.",
+                    DifficultyLevel.BEGINNER, "Phrasal Verbs",
+                    Arrays.asList(
+                            new AnswerOption("drop / off", false),
+                            new AnswerOption("pick / up", false),
+                            new AnswerOption("call / back", true),
+                            new AnswerOption("look / after", false)
+                    )
             ));
 
     // Construtor com Injeção de Dependência
