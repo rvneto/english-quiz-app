@@ -1,0 +1,61 @@
+# Nome do Workflow (aparece no separador "Actions" do GitHub)
+name: CI Backend - Java/Maven Build & Test
+
+# Define quando este workflow deve ser executado
+on:
+  # Executa em pushes para o branch 'main'
+  push:
+    branches: ['main']
+    # IMPORTANTE (Monorepo): Só executa se os ficheiros alterados estiverem na pasta 'backend/'
+    paths:
+      - 'backend/**'
+
+  # Executa em Pull Requests que têm como alvo o branch 'main'
+  pull_request:
+    branches: ['main']
+    # Só executa se os ficheiros alterados estiverem na pasta 'backend/'
+    paths:
+      - 'backend/**'
+
+# Define os "trabalhos" (jobs) que serão executados
+jobs:
+  # Nome do job (pode ser qualquer nome)
+  build-and-test-backend:
+    # A máquina virtual que o GitHub irá usar (Ubuntu é o padrão)
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout do Código
+      # Baixa o seu código (o repositório completo) para a máquina virtual
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configurar o Java (JDK)
+      # Instala o Java 21 (o mesmo que usámos no Dockerfile do backend)
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin' # (Eclipse Temurin, o mesmo que usámos)
+          cache: 'maven' # Ativa o cache das dependências do Maven
+
+      # 3. Executar os Testes Unitários
+      # Corre o comando 'mvn test' apontando para o pom.xml correto
+      - name: Run Unit Tests (Maven)
+        # O '-B' é "batch mode" (para logs limpos)
+        # O '--file' aponta para o pom.xml dentro da pasta 'backend'
+        run: mvn -B test --file backend/pom.xml
+
+      # 4. (Opcional, mas recomendado) Construir o Pacote (JAR)
+      # Se os testes passarem, ele constrói o .jar final
+      - name: Package Application (Build JAR)
+        run: mvn -B package -DskipTests --file backend/pom.xml
+
+      # 5. (Opcional) Guardar o Artefacto (o .jar)
+      # Guarda o .jar construído para que o possamos usar no Deploy (próximo passo)
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          # O caminho para o JAR (geralmente em backend/target/)
+          path: backend/target/*.jar
